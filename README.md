@@ -40,7 +40,7 @@ This repository provides a massive, curated library of 2,300+ skills, but delibe
 
 ### 1. Clone & Build the Index (All Platforms)
 ```bash
-git clone https://github.com/YOUR_USERNAME/agent-god-mode.git
+git clone https://github.com/levalencia/agent-god-mode.git
 cd agent-god-mode
 npm install
 ```
