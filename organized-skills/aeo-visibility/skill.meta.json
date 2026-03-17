@@ -1,0 +1,15 @@
+{
+  "slug": "aeo-visibility",
+  "category": "capabilities",
+  "tags": [
+    "seo"
+  ],
+  "installation": {
+    "base_command": "npx goose-skills install aeo-visibility",
+    "supports": [
+      "claude",
+      "cursor",
+      "codex"
+    ]
+  }
+}
