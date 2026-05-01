@@ -3,7 +3,10 @@ const path = require('path');
 const { globSync } = require('glob');
 const matter = require('gray-matter');
 
-const SKILLS_DIR = path.join(__dirname, '../organized-skills');
+const SKILLS_DIRS = [
+  path.join(__dirname, '../skills'),
+  path.join(__dirname, '../organized-skills'),
+];
 const OUTPUT_FILE = path.join(__dirname, '../index.json');
 
 async function buildIndex() {
@@ -14,14 +17,18 @@ async function buildIndex() {
   
   const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
-  console.log(`Scanning for SKILL.md files in ${SKILLS_DIR}...`);
-  const files = globSync(`${SKILLS_DIR}/**/SKILL.md`);
+  const allFiles: string[] = [];
+  for (const dir of SKILLS_DIRS) {
+    const files = globSync(`${dir}/**/SKILL.md`);
+    allFiles.push(...files);
+    console.log(`Found ${files.length} SKILL.md files in ${dir}`);
+  }
 
-  console.log(`Found ${files.length} skills. Parsing frontmatter...`);
+  console.log(`Total: ${allFiles.length} skills. Parsing frontmatter...`);
 
   const skills = [];
 
-  for (const file of files) {
+  for (const file of allFiles) {
     try {
       const content = fs.readFileSync(file, 'utf-8');
       const parsed = matter(content);

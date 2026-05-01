@@ -2,3 +2,6 @@ node_modules/
 index.json
 .DS_Store
 *.log
+MARKETING_CONTENT.md
+articles/
+organized-skills/skill-installer/scripts/__pycache__/

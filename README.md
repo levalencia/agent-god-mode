@@ -1,6 +1,6 @@
 # ⚡️ Agent God Mode
 
-> **Turn your AI coding assistant into an Omni-Agent. Give OpenCode & Claude Code 2,300+ specialized skills without nuking your context window or bankrupting your API costs.**
+> **Turn your AI coding assistant into an Omni-Agent. Give OpenCode & Claude Code 2,300+ domain skills + 20 production-grade engineering workflows without nuking your context window or bankrupting your API costs.**
 
 Imagine giving your AI coding agent a Ph.D. in Quantum Computing, an MBA in Product Marketing, and a Senior Staff DevOps certification—all at the same time. 
 
@@ -21,14 +21,28 @@ However, their native implementation dynamically reads the `name` and `descripti
 2. 💸 **Skyrocketing Costs:** You pay for those tokens on every single message.
 3. 🧠 **LLM Confusion:** The agent gets overwhelmed by thousands of irrelevant instructions.
 
-## 💡 The Solution: The Background Vault
+## 💡 The Solution: Two-Tier Hybrid Architecture
 
-This repository provides a massive, curated library of 2,300+ skills, but deliberately hides them from the native agent. Instead, it equips your agent with a **Local AI Search Tool**:
+This repository combines two powerful systems into a single, zero-bloat skill architecture:
 
-1. **Total Isolation:** Skills are kept in `organized-skills/`, safely hidden from the agent's default prompt.
+### Tier 1 — Lifecycle Skills (`skills/`)
+20 production-grade engineering skills from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) that enforce *how* software is built. These cover the entire SDLC:
+- **DEFINE** → `spec-driven-development`
+- **PLAN** → `planning-and-task-breakdown`
+- **BUILD** → `incremental-implementation`, `test-driven-development`
+- **VERIFY** → `debugging-and-error-recovery`
+- **REVIEW** → `code-review-and-quality`
+- **SHIP** → `shipping-and-launch`
+
+### Tier 2 — Domain Skills (`organized-skills/`)
+2,300+ specialized skills covering *what* to build in specific contexts: Azure, AWS, Kubernetes, Qiskit, marketing, design, security, and thousands more.
+
+### How It Works
+1. **Total Isolation:** Both tiers are kept outside the agent's default prompt to prevent context bloat.
 2. **Free, Local Embeddings:** A setup script uses `@xenova/transformers` to generate lightweight, private vectors on your CPU. No OpenAI/Anthropic API keys required.
-3. **Sandbox-Bypassing Worker:** Because agents often run custom tools in restricted sandboxes, we built a background Node.js worker (`skill_search_worker.mjs`) that safely calculates cosine similarity outside the sandbox.
-4. **Just-In-Time Injection:** The agent searches the vault, gets the top 3 matches, and reads *only* the specific `SKILL.md` files it needs.
+3. **Two-Pass Search:** The agent first checks for lifecycle intent (specs, testing, shipping), then runs a RAG embedding search for domain knowledge.
+4. **Sandbox-Bypassing Worker:** A background Node.js worker (`skill_search_worker.mjs`) safely calculates cosine similarity outside the sandbox.
+5. **Just-In-Time Injection:** The agent receives exactly the skills it needs — process skills *and* domain skills — precisely when it needs them.
 
 ---
 
@@ -45,7 +59,7 @@ cd agent-god-mode
 npm install
 ```
 
-Run the indexer. This downloads a tiny (~22MB) embedding model directly to your machine and processes all 2,300+ skills into a local vector database.
+Run the indexer. This downloads a tiny (~22MB) embedding model directly to your machine and processes all ~2,323 skills (20 lifecycle + 2,300+ domain) into a local vector database.
 ```bash
 npm run build-index
 ```
@@ -134,45 +148,61 @@ In your main terminal, open your agent (`opencode` or `claude`) and paste a comp
 
 Here are three massive, cross-disciplinary prompts that prove the agent is dynamically loading highly-specialized skills on demand.
 
-### Example 1: The Enterprise DevOps Architect
+### Example 1: The Full-Stack Feature Build (Two-Tier in Action)
 **You Ask:**
-> "I need to configure Azure API Management as an AI Gateway for my MCP tools with semantic caching. Please search the vault for how to do this."
+> "Build a new authentication feature for my Azure Container Apps project. Use best practices."
 
 **What Happens in the Logs:**
 ```text
-[2026-03-17T07:45:08.690Z] 🔍 QUERY RECEIVED: "configure Azure API Management AI Gateway MCP tools semantic caching"
-[2026-03-17T07:45:08.690Z] ✅ MATCHES FOUND:
-    - azure-devops-skill (43.5%)
-    - az-aks-agent (39.3%)
-    - icims-talent-cloud-automation (38.8%)
+[2026-04-30T10:15:08.690Z] 🔍 QUERY RECEIVED: "Build a new authentication feature for my Azure Container Apps project"
+[2026-04-30T10:15:08.690Z] ✅ MATCHES FOUND:
+    [LIFECYCLE] spec-driven-development (100.0%)
+    [LIFECYCLE] test-driven-development (100.0%)
+    [LIFECYCLE] incremental-implementation (100.0%)
+    [DOMAIN] azure-container-apps (91.2%)
+    [DOMAIN] security-and-hardening (87.5%)
+```
+**The Result:** The agent doesn't just start coding. It follows `spec-driven-development` to write a PRD first, uses `test-driven-development` to write failing tests, and references the `azure-container-apps` + `security-and-hardening` skills for the exact Bicep/Terraform and auth patterns. Two-tier architecture ensures process *and* domain expertise.
+
+### Example 2: The Enterprise DevOps Architect
+**You Ask:**
+> "I need to configure Azure API Management as an AI Gateway for my MCP tools with semantic caching."
+
+**What Happens in the Logs:**
+```text
+[2026-04-30T07:45:08.690Z] 🔍 QUERY RECEIVED: "configure Azure API Management AI Gateway MCP tools semantic caching"
+[2026-04-30T07:45:08.690Z] ✅ MATCHES FOUND:
+    [DOMAIN] azure-aigateway (94.3%)
+    [DOMAIN] azure-devops (43.5%)
+    [DOMAIN] az-aks-agent (39.3%)
 ```
 **The Result:** The agent bypasses generic advice, reads the specific Azure DevOps guidelines, and outputs the exact XML policy configurations for semantic caching.
 
-### Example 2: The Quantum Scientist
+### Example 3: The Quantum Scientist
 **You Ask:**
-> "I need to build a quantum circuit using Qiskit that implements Grover's algorithm to search an unstructured database. Please search the vault for the best patterns and syntax."
+> "I need to build a quantum circuit using Qiskit that implements Grover's algorithm to search an unstructured database."
 
 **What Happens in the Logs:**
 ```text
-[2026-03-17T08:12:14.221Z] 🔍 QUERY RECEIVED: "Qiskit quantum circuit Grover's algorithm unstructured database"
-[2026-03-17T08:12:14.221Z] ✅ MATCHES FOUND:
-    - qiskit (74.2%)
-    - scientific-brainstorming (41.1%)
-    - python-data-science (38.5%)
+[2026-04-30T08:12:14.221Z] 🔍 QUERY RECEIVED: "Qiskit quantum circuit Grover's algorithm unstructured database"
+[2026-04-30T08:12:14.221Z] ✅ MATCHES FOUND:
+    [DOMAIN] qiskit (74.2%)
+    [DOMAIN] scientific-brainstorming (41.1%)
+    [DOMAIN] python-data-science (38.5%)
 ```
 **The Result:** The agent dynamically loads the `qiskit` skill, pulling in the precise mathematical formulations and Python syntax required to initialize the superposition and amplitude amplification steps.
 
-### Example 3: The Growth Marketer
+### Example 4: The Growth Marketer
 **You Ask:**
 > "We are starting a new marketing project and need to establish our tone of voice, visual identity, and typography rules. How should we set up our brand guidelines document?"
 
 **What Happens in the Logs:**
 ```text
-[2026-03-17T08:15:33.901Z] 🔍 QUERY RECEIVED: "tone of voice visual identity typography brand guidelines marketing"
-[2026-03-17T08:15:33.901Z] ✅ MATCHES FOUND:
-    - brand-guidelines (68.9%)
-    - campaign-brief-generator (55.4%)
-    - ux-design-patterns (49.2%)
+[2026-04-30T08:15:33.901Z] 🔍 QUERY RECEIVED: "tone of voice visual identity typography brand guidelines marketing"
+[2026-04-30T08:15:33.901Z] ✅ MATCHES FOUND:
+    [DOMAIN] brand-guidelines (68.9%)
+    [DOMAIN] campaign-brief-generator (55.4%)
+    [DOMAIN] ux-design-patterns (49.2%)
 ```
 **The Result:** The agent abandons "coding mode" entirely, adopting the persona of an expert Brand Strategist to structure your brand pillars, tone matrix, and hex color constraints.
 
@@ -202,25 +232,32 @@ We want to build the largest, most powerful library of AI agent skills on the in
 
 ### How to Contribute a Skill
 1. **Fork the repo** and clone it locally.
-2. **Create a new folder** inside the `organized-skills/` directory. Name it descriptively (e.g., `kubernetes-expert-troubleshooter`).
-3. **Add your `SKILL.md` file** inside that folder. This file should contain the actual instructions, rules, and workflows you want the agent to adopt. *(Feel free to include reference files, templates, or code snippets in the same folder!)*
-4. **Test it locally (Optional):** Run `npm run build-index` to rebuild the vector database and ensure your skill gets embedded correctly.
-5. **Commit, Push, and PR:**
+2. **Decide which tier your skill belongs to:**
+   - **Tier 1 (`skills/`)**: Only for broad, software engineering lifecycle skills (specs, testing, reviews, shipping). These must follow the format of [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).
+   - **Tier 2 (`organized-skills/`)**: For domain-specific, framework, or tool-specific skills (Azure, Qiskit, marketing, etc.).
+3. **Create a new folder** inside the appropriate directory. Name it descriptively (e.g., `kubernetes-expert-troubleshooter`).
+4. **Add your `SKILL.md` file** inside that folder. This file should contain the actual instructions, rules, and workflows you want the agent to adopt. *(Feel free to include reference files, templates, or code snippets in the same folder!)*
+5. **Test it locally (Optional):** Run `npm run build-index` to rebuild the vector database and ensure your skill gets embedded correctly.
+6. **Commit, Push, and PR:**
    ```bash
    git checkout -b feature/add-awesome-skill
    git add .
    git commit -m "Add [Skill Name] to the vault"
    git push origin feature/add-awesome-skill
    ```
-6. **Open a Pull Request!** We will review your skill and merge it into the global vault for everyone to use.
+7. **Open a Pull Request!** We will review your skill and merge it into the global vault for everyone to use.
 
 ---
 
 ## 🤝 Credits & Origins
 
-This repository is an **aggregation, curation, and optimization effort**. The 2,300+ skills contained within the `organized-skills/` directory were not all written from scratch by the authors of this repository. 
+This repository is an **aggregation, curation, and optimization effort**. The skills within were not all written from scratch by the authors of this repository.
 
-They were carefully collected, standardized, and organized from various incredible open-source communities, prompt libraries, and the official baseline skill repositories from projects like Claude Code and OpenCode. 
+### Tier 1: Lifecycle Skills
+The 20 production-grade engineering skills in `skills/`, `agents/`, `references/`, and `hooks/` are from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani, used under the MIT License. They were integrated to provide structured software engineering lifecycle enforcement.
+
+### Tier 2: Domain Skills
+The 2,300+ skills in `organized-skills/` were carefully collected, standardized, and organized from various incredible open-source communities, prompt libraries, and the official baseline skill repositories from projects like Claude Code and OpenCode.
 
 ### Original Repositories
 We extend our deepest gratitude to the creators of the following repositories, whose work forms the foundation of this vault:
@@ -250,6 +287,9 @@ We extend our deepest gratitude to the creators of the following repositories, w
 - [trailofbits/skills](https://github.com/trailofbits/skills)
 - [karanb192/awesome-claude-skills](https://github.com/karanb192/awesome-claude-skills)
 - [mhylle/claude-skills-collection](https://github.com/mhylle/claude-skills-collection)
+- [tradermonty/claude-trading-skills](https://github.com/tradermonty/claude-trading-skills)
+- [marketcalls/vectorbt-backtesting-skills](https://github.com/marketcalls/vectorbt-backtesting-skills)
+- [ajeeshworkspace/indian-trading-skills](https://github.com/ajeeshworkspace/indian-trading-skills)
 
 By grouping these open-source resources into a scalable RAG architecture, our goal is to amplify their usefulness for the developer community. If you recognize a skill you authored and would like explicit attribution on the file or wish for it to be removed, please open an issue!
 
