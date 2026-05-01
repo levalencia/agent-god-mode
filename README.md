@@ -21,6 +21,10 @@ However, their native implementation dynamically reads the `name` and `descripti
 2. 💸 **Skyrocketing Costs:** You pay for those tokens on every single message.
 3. 🧠 **LLM Confusion:** The agent gets overwhelmed by thousands of irrelevant instructions.
 
+## 📖 Day-to-Day Usage
+
+New to Agent God Mode? Start here: **[docs/USAGE.md](docs/USAGE.md)** — a complete guide mapping real work scenarios (building features, fixing bugs, code reviews, shipping, learning new tech) to the right skills and personas.
+
 ## 💡 The Solution: Two-Tier Hybrid Architecture
 
 This repository combines two powerful systems into a single, zero-bloat skill architecture:
